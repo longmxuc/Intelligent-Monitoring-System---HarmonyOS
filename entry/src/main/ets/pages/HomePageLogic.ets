@@ -20,6 +20,7 @@ interface SensorData {
 interface WebSocketMessage {
   type: string;
   ts?: number;
+  timestamp?: number;
   temp?: number;
   hum?: number;
   lux?: number;
@@ -27,10 +28,14 @@ interface WebSocketMessage {
   pressure?: number;
   temp2?: number;
   rs_ro?: number;
+  // 定位相关字段
   lon?: number;
   lat?: number;
-  utc?: number;
+  utc?: number | string;
   csq?: number;
+  iccid?: string;
+  imei?: string;
+  location_type?: string;
 }
 
 // 趋势结果接口
@@ -67,6 +72,13 @@ export interface HomePageView {
   smokeTrend: TrendResult;
   pressureTrend: TrendResult;
   tempDiffTrend: TrendResult;
+  // 定位展示字段
+  locationStatus: string;
+  locationStatusColor: string;
+  locationLon: string;
+  locationLat: string;
+  locationExtra: string;
+  locationAvailable: boolean;
 }
 
 // HomePage 业务逻辑类：负责 WebSocket 连接与数据解析、趋势计算等
@@ -143,6 +155,55 @@ export class HomePageLogic {
         text: `下降 ${Math.abs(diff).toFixed(2)} ${unit}`
       };
     }
+  }
+
+  // 处理定位数据并更新 UI
+  private updateLocationInfo(data: WebSocketMessage): void {
+    const lonVal = data.lon !== undefined ? Number(data.lon) : NaN;
+    const latVal = data.lat !== undefined ? Number(data.lat) : NaN;
+
+    if (Number.isNaN(lonVal) || Number.isNaN(latVal)) {
+      this.view.locationStatus = '定位数据缺失';
+      this.view.locationStatusColor = '#ef4444';
+      this.view.locationLon = '--';
+      this.view.locationLat = '--';
+      this.view.locationExtra = '';
+      this.view.locationAvailable = false;
+      return;
+    }
+
+    // 格式化时间：支持 number(秒/毫秒) 与 ISO 字符串
+    const formatUtc = (utcVal: number | string | undefined): string => {
+      if (utcVal === undefined || utcVal === null) {
+        return '';
+      }
+      if (typeof utcVal === 'number') {
+        const ms = utcVal > 1e12 ? utcVal : utcVal * 1000;
+        return new Date(ms).toLocaleString('zh-CN');
+      }
+      const date = new Date(utcVal);
+      return Number.isNaN(date.getTime()) ? String(utcVal) : date.toLocaleString('zh-CN');
+    };
+
+    this.view.locationLon = lonVal.toFixed(6);
+    this.view.locationLat = latVal.toFixed(6);
+    this.view.locationAvailable = true;
+
+    const extras: string[] = [];
+    if (data.location_type) {
+      extras.push(`类型: ${data.location_type}`);
+    }
+    if (data.csq !== undefined && data.csq !== null) {
+      extras.push(`信号: ${data.csq}`);
+    }
+    const timeText = formatUtc(data.utc);
+    if (timeText) {
+      extras.push(`时间: ${timeText}`);
+    }
+    this.view.locationExtra = extras.join(' | ');
+
+    this.view.locationStatus = '定位成功';
+    this.view.locationStatusColor = '#22c55e';
   }
 
   // 更新所有趋势
@@ -260,6 +321,7 @@ export class HomePageLogic {
     // 处理定位数据
     if (msg.type === 'location') {
       console.info('收到定位数据:', msg);
+      this.updateLocationInfo(msg);
       return;
     }
 
@@ -349,6 +411,13 @@ export class HomePageLogic {
       this.view.wsConnected = true;
       this.isReconnecting = false;
       this.reconnectCount = 0;
+      // 连接成功后等待定位推送
+      this.view.locationStatus = '等待定位数据';
+      this.view.locationStatusColor = '#f59e0b';
+      this.view.locationLon = '--';
+      this.view.locationLat = '--';
+      this.view.locationExtra = '';
+      this.view.locationAvailable = false;
     });
 
     // 订阅消息接收事件
@@ -371,6 +440,12 @@ export class HomePageLogic {
     this.ws.on('close', (err: BusinessError, value: webSocket.CloseResult) => {
       console.info('WebSocket 连接关闭, code:', value.code, ', reason:', value.reason);
       this.view.wsConnected = false;
+      this.view.locationStatus = '定位未连接';
+      this.view.locationStatusColor = '#9ca3af';
+      this.view.locationLon = '--';
+      this.view.locationLat = '--';
+      this.view.locationExtra = '';
+      this.view.locationAvailable = false;
 
       if (!this.isReconnecting && value.code !== 1000) {
         console.info('检测到异常关闭，将尝试重连');
@@ -437,4 +512,3 @@ export class HomePageLogic {
     }
   }
 }
-

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>设备定位地图</title>
+  <!-- 高德地图 JS API（请将 key 替换为你的 Web 端 Key） -->
+  <script type="text/javascript"
+          src="https://webapi.amap.com/maps?v=2.0&key=d9c0da9a178ac2eb0b58f50428efc4e1">
+  </script>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: transparent;
+    }
+
+    .marker-pin {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #ef4444;
+      border: 2px solid #ffffff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, .35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 16px;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+<div id="map"></div>
+
+<script>
+  // 解析 URL 查询参数
+  function getQueryParams() {
+    const params = new URLSearchParams(window.location.search || '');
+    const lon = parseFloat(params.get('lon') || '');
+    const lat = parseFloat(params.get('lat') || '');
+    const csq = params.get('csq');
+    const locationType = params.get('location_type');
+    const utc = params.get('utc');
+    return { lon, lat, csq, locationType, utc };
+  }
+
+  function formatUtc(utc) {
+    if (!utc) return '';
+    // 同时兼容时间戳和 ISO 字符串
+    if (!isNaN(Number(utc))) {
+      const n = Number(utc);
+      const ms = n > 1e12 ? n : n * 1000;
+      return new Date(ms).toLocaleString('zh-CN');
+    }
+    const d = new Date(utc);
+    return isNaN(d.getTime()) ? String(utc) : d.toLocaleString('zh-CN');
+  }
+
+  function init() {
+    const { lon, lat } = getQueryParams();
+    if (!lon || !lat || isNaN(lon) || isNaN(lat)) {
+      return;
+    }
+
+    // 初始化高德地图
+    const map = new AMap.Map('map', {
+      zoom: 15,
+      center: [lon, lat],
+      viewMode: '3D'
+    });
+
+    // 使用内联内容作为点标记，避免外部图标加载失败
+    const marker = new AMap.Marker({
+      position: [lon, lat],
+      anchor: 'bottom-center',
+      content: '<div class="marker-pin"></div>'
+    });
+    map.add(marker);
+  }
+
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    setTimeout(init, 0);
+  } else {
+    document.addEventListener('DOMContentLoaded', init);
+  }
+</script>
+</body>
+</html>

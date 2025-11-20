@@ -5,6 +5,9 @@
   "main": "",
   "author": "",
   "license": "",
-  "dependencies": {}
+  "dependencies": {
+    "@amap/amap_lbs_common": ">=1.2.3",
+    "@amap/amap_lbs_map3d": ">=2.2.5",
+    "@amap/amap_lbs_search": ">=1.0.2"
+  }
 }
-
