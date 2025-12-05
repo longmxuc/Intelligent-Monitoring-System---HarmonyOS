@@ -19,6 +19,7 @@ interface SensorData {
 // WebSocket 消息接口
 interface WebSocketMessage {
   type: string;
+  device_id?: string; // 设备ID
   ts?: number;
   timestamp?: number;
   temp?: number;
@@ -79,11 +80,14 @@ export interface HomePageView {
   locationLat: string;
   locationExtra: string;
   locationAvailable: boolean;
+  // 图表更新方法
+  updateCharts?: (timestamp: number, temp: number, hum: number, lux: number, smoke: number, pressure: number) => void;
 }
 
 // HomePage 业务逻辑类：负责 WebSocket 连接与数据解析、趋势计算等
-export class HomePageLogic {
+export class DeviceDetailPageLogic {
   private view: HomePageView;
+  private deviceId: string; // 当前设备ID
 
   // 数据存储数组（用于趋势计算）
   private tempsAll: number[] = [];
@@ -106,8 +110,16 @@ export class HomePageLogic {
   private reconnectCount: number = 0;
   private readonly MAX_RECONNECT_COUNT = 10;
 
-  constructor(view: HomePageView) {
+  constructor(view: HomePageView, deviceId: string = '') {
     this.view = view;
+    this.deviceId = deviceId.trim().toUpperCase(); // 规范化设备ID
+    console.info(`DeviceDetailPageLogic 构造函数 - deviceId: ${this.deviceId}`);
+  }
+
+  // 设置设备ID（用于延迟设置）
+  setDeviceId(deviceId: string): void {
+    this.deviceId = deviceId.trim().toUpperCase();
+    console.info(`DeviceDetailPageLogic 设置 deviceId: ${this.deviceId}`);
   }
 
   // 计算数组首尾差值（用于趋势判断）
@@ -239,6 +251,18 @@ export class HomePageLogic {
     this.view.rs_ro = data.rs_ro;
     this.view.sampleCount++;
 
+    // 更新图表（如果方法存在）
+    if (this.view.updateCharts && data.ts !== undefined && data.temp !== undefined && data.hum !== undefined) {
+      this.view.updateCharts(
+        data.ts,
+        data.temp,
+        data.hum,
+        data.lux ?? 0,
+        data.smoke ?? 0,
+        data.pressure ?? 0
+      );
+    }
+
     // 将数据添加到数组末尾
     if (data.temp !== undefined && data.temp !== null) {
       this.tempsAll.push(data.temp);
@@ -300,9 +324,21 @@ export class HomePageLogic {
       return;
     }
 
+    // 打印原始消息用于调试
+    console.info('收到WebSocket消息:', JSON.stringify(msg));
+
     // 处理连接成功消息
     if (msg.type === 'hello') {
       console.info('收到服务器连接确认消息');
+      return;
+    }
+
+    // 过滤设备ID：只处理当前设备的消息
+    const msgDeviceId = msg.device_id ? msg.device_id.trim().toUpperCase() : '';
+    
+    // 对于包含device_id的消息，只处理匹配当前设备的消息
+    if (msgDeviceId && msgDeviceId !== this.deviceId) {
+      console.info(`跳过其他设备的消息: ${msgDeviceId} (当前设备: ${this.deviceId})`);
       return;
     }
 

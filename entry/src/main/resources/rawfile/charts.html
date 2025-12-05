@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据图表</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
+    <style>
+        /* CSS 变量定义 - 亮色模式（与鸿蒙 base/color.json 对应） */
+        :root {
+            --bg-color: #F5F7FA;                    /* home_background */
+            --card-bg: #FFFFFF;                     /* home_card_background */
+            --card-border: #E3E4E9;                 /* home_card_border */
+            --title-text: #666666;                  /* home_title_text */
+            --value-text: #333333;                  /* home_value_text */
+            --status-text: #808080;                 /* home_status_text */
+            --border-color: #D7D9DF;                /* home_border */
+            
+            /* 图表专用颜色 */
+            --chart-grid: rgba(227, 228, 233, 0.5); /* 浅色网格线 */
+            --chart-text: #666666;                  /* 图表文字颜色 */
+            
+            /* 图表数据线颜色（亮色模式） */
+            --line-temp: #ef4444;                   /* 温度 - 红色 */
+            --line-hum: #059669;                    /* 湿度 - 绿色 */
+            --line-lux: #7c3aed;                    /* 亮度 - 紫色 */
+            --line-smoke: #ea580c;                  /* 烟雾 - 橙色 */
+            --line-pressure: #db2777;               /* 气压 - 粉色 */
+        }
+        
+        /* 暗色模式类（由鸿蒙端控制） */
+        :root.dark-mode {
+            --bg-color: #0B1020;                /* home_background */
+            --card-bg: #0F162E;                 /* home_card_background */
+            --card-border: #1B2440;             /* home_card_border */
+            --title-text: #9CA3AF;              /* home_title_text */
+            --value-text: #F9FAFB;              /* home_value_text */
+            --status-text: #9CA3AF;             /* home_status_text */
+            --border-color: #374151;            /* home_border */
+            
+            /* 图表专用颜色 */
+            --chart-grid: rgba(27, 36, 64, 0.5); /* 深色网格线 */
+            --chart-text: #9CA3AF;              /* 图表文字颜色 */
+            
+            /* 图表数据线颜色（暗色模式 - 更亮更鲜艳） */
+            --line-temp: #f97316;               /* 温度 - 亮橙色 */
+            --line-hum: #34d399;                /* 湿度 - 亮绿色 */
+            --line-lux: #a78bfa;                /* 亮度 - 亮紫色 */
+            --line-smoke: #fb923c;              /* 烟雾 - 亮橙色 */
+            --line-pressure: #ec4899;           /* 气压 - 亮粉色 */
+        }
+        
+        /* 备用：媒体查询暗色模式（如果鸿蒙端未设置） */
+        @media (prefers-color-scheme: dark) {
+            :root:not(.light-mode) {
+                --bg-color: #0B1020;
+                --card-bg: #0F162E;
+                --card-border: #1B2440;
+                --title-text: #9CA3AF;
+                --value-text: #F9FAFB;
+                --status-text: #9CA3AF;
+                --border-color: #374151;
+                --chart-grid: rgba(27, 36, 64, 0.5);
+                --chart-text: #9CA3AF;
+                --line-temp: #f97316;
+                --line-hum: #34d399;
+                --line-lux: #a78bfa;
+                --line-smoke: #fb923c;
+                --line-pressure: #ec4899;
+            }
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            overflow: hidden; /* 禁用html滚动 */
+            height: 100%;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: transparent;
+            overflow: hidden; /* 禁用滚动条，由外层Scroll控制 */
+            margin: 0;
+            padding: 0;
+        }
+        
+        .chart-container {
+            margin-bottom: 16px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .chart-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--title-text);
+            text-align: center;
+        }
+        
+        .chart-wrapper {
+            position: relative;
+            height: 200px;
+        }
+        
+        canvas {
+            display: block;
+            width: 100% !important;
+            height: 100% !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="chart-container">
+        <div class="chart-title">温湿度曲线</div>
+        <div class="chart-wrapper">
+            <canvas id="chartTH"></canvas>
+        </div>
+    </div>
+    
+    <div class="chart-container">
+        <div class="chart-title">亮度曲线</div>
+        <div class="chart-wrapper">
+            <canvas id="chartLux"></canvas>
+        </div>
+    </div>
+    
+    <div class="chart-container">
+        <div class="chart-title">烟雾浓度曲线</div>
+        <div class="chart-wrapper">
+            <canvas id="chartSmoke"></canvas>
+        </div>
+    </div>
+    
+    <div class="chart-container">
+        <div class="chart-title">大气压曲线</div>
+        <div class="chart-wrapper">
+            <canvas id="chartPressure"></canvas>
+        </div>
+    </div>
+
+    <script>
+        // 数据存储
+        const MAX_POINTS = 50;
+        const labels = [];
+        const tempData = [];
+        const humData = [];
+        const luxData = [];
+        const smokeData = [];
+        const pressureData = [];
+        
+        // 获取CSS变量颜色
+        function getCSSVar(name) {
+            return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+        }
+        
+        // 图表配置（使用CSS变量的颜色）
+        function getBaseConfig() {
+            const gridColor = getCSSVar('--chart-grid');
+            const textColor = getCSSVar('--chart-text');
+            
+            return {
+                type: 'line',
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: false,
+                    interaction: {
+                        mode: 'nearest',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                boxWidth: 12,
+                                padding: 8,
+                                font: { size: 11 },
+                                color: textColor
+                            }
+                        },
+                        tooltip: {
+                            enabled: true,
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#fff',
+                            bodyColor: '#fff',
+                            borderColor: getCSSVar('--card-border'),
+                            borderWidth: 1
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: true,
+                            ticks: {
+                                maxRotation: 0,
+                                autoSkip: true,
+                                maxTicksLimit: 6,
+                                font: { size: 10 },
+                                color: textColor
+                            },
+                            grid: {
+                                display: true,
+                                color: gridColor
+                            }
+                        },
+                        y: {
+                            display: true,
+                            position: 'left',
+                            ticks: {
+                                font: { size: 10 },
+                                color: textColor
+                            },
+                            grid: {
+                                display: true,
+                                color: gridColor
+                            }
+                        }
+                    },
+                    elements: {
+                        point: {
+                            radius: 0,
+                            hitRadius: 8,
+                            hoverRadius: 4
+                        },
+                        line: {
+                            borderWidth: 2,
+                            tension: 0.4
+                        }
+                    }
+                }
+            };
+        }
+        
+        // 创建温湿度图表
+        const ctxTH = document.getElementById('chartTH').getContext('2d');
+        const baseConfig = getBaseConfig();
+        const tempColor = getCSSVar('--line-temp');
+        const humColor = getCSSVar('--line-hum');
+        
+        const configTH = {
+            ...baseConfig,
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: '温度 (°C)',
+                        data: tempData,
+                        borderColor: tempColor,
+                        backgroundColor: tempColor + '20', // 添加透明度
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: '湿度 (%)',
+                        data: humData,
+                        borderColor: humColor,
+                        backgroundColor: humColor + '20',
+                        yAxisID: 'y1'
+                    }
+                ]
+            },
+            options: {
+                ...baseConfig.options,
+                scales: {
+                    ...baseConfig.options.scales,
+                    y1: {
+                        display: true,
+                        position: 'right',
+                        ticks: {
+                            font: { size: 10 },
+                            color: getCSSVar('--chart-text')
+                        },
+                        grid: {
+                            drawOnChartArea: false
+                        }
+                    }
+                }
+            }
+        };
+        const chartTH = new Chart(ctxTH, configTH);
+        
+        // 创建亮度图表
+        const ctxLux = document.getElementById('chartLux').getContext('2d');
+        const luxColor = getCSSVar('--line-lux');
+        const chartLux = new Chart(ctxLux, {
+            ...getBaseConfig(),
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: '亮度 (lux)',
+                    data: luxData,
+                    borderColor: luxColor,
+                    backgroundColor: luxColor + '20'
+                }]
+            }
+        });
+        
+        // 创建烟雾图表
+        const ctxSmoke = document.getElementById('chartSmoke').getContext('2d');
+        const smokeColor = getCSSVar('--line-smoke');
+        const chartSmoke = new Chart(ctxSmoke, {
+            ...getBaseConfig(),
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: '烟雾浓度 (ppm)',
+                    data: smokeData,
+                    borderColor: smokeColor,
+                    backgroundColor: smokeColor + '20'
+                }]
+            }
+        });
+        
+        // 创建大气压图表
+        const ctxPressure = document.getElementById('chartPressure').getContext('2d');
+        const pressureColor = getCSSVar('--line-pressure');
+        const chartPressure = new Chart(ctxPressure, {
+            ...getBaseConfig(),
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: '大气压 (hPa)',
+                    data: pressureData,
+                    borderColor: pressureColor,
+                    backgroundColor: pressureColor + '20'
+                }]
+            }
+        });
+        
+        // 添加数据点（由鸿蒙应用调用）
+        function addDataPoint(timestamp, temp, hum, lux, smoke, pressure) {
+            // 格式化时间标签
+            const date = new Date(timestamp * 1000);
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+            const label = `${hours}:${minutes}:${seconds}`;
+            
+            // 添加数据
+            labels.push(label);
+            tempData.push(temp);
+            humData.push(hum);
+            luxData.push(lux);
+            smokeData.push(smoke);
+            pressureData.push(pressure);
+            
+            // 限制数据点数量
+            if (labels.length > MAX_POINTS) {
+                labels.shift();
+                tempData.shift();
+                humData.shift();
+                luxData.shift();
+                smokeData.shift();
+                pressureData.shift();
+            }
+            
+            // 更新图表
+            chartTH.update('none');
+            chartLux.update('none');
+            chartSmoke.update('none');
+            chartPressure.update('none');
+        }
+        
+        // 清空数据（由鸿蒙应用调用）
+        function clearData() {
+            labels.length = 0;
+            tempData.length = 0;
+            humData.length = 0;
+            luxData.length = 0;
+            smokeData.length = 0;
+            pressureData.length = 0;
+            
+            chartTH.update('none');
+            chartLux.update('none');
+            chartSmoke.update('none');
+            chartPressure.update('none');
+        }
+        
+        // 设置主题模式（由鸿蒙应用调用）
+        function setTheme(isDark) {
+            const root = document.documentElement;
+            if (isDark) {
+                root.classList.add('dark-mode');
+                root.classList.remove('light-mode');
+            } else {
+                root.classList.add('light-mode');
+                root.classList.remove('dark-mode');
+            }
+            
+            // 更新所有图表颜色
+            updateAllChartColors();
+        }
+        
+        // 更新所有图表的颜色
+        function updateAllChartColors() {
+            const gridColor = getCSSVar('--chart-grid');
+            const textColor = getCSSVar('--chart-text');
+            const tempColor = getCSSVar('--line-temp');
+            const humColor = getCSSVar('--line-hum');
+            const luxColor = getCSSVar('--line-lux');
+            const smokeColor = getCSSVar('--line-smoke');
+            const pressureColor = getCSSVar('--line-pressure');
+            
+            // 更新温湿度图表
+            if (chartTH) {
+                chartTH.options.plugins.legend.labels.color = textColor;
+                chartTH.options.scales.x.ticks.color = textColor;
+                chartTH.options.scales.x.grid.color = gridColor;
+                chartTH.options.scales.y.ticks.color = textColor;
+                chartTH.options.scales.y.grid.color = gridColor;
+                chartTH.options.scales.y1.ticks.color = textColor;
+                
+                chartTH.data.datasets[0].borderColor = tempColor;
+                chartTH.data.datasets[0].backgroundColor = tempColor + '20';
+                chartTH.data.datasets[1].borderColor = humColor;
+                chartTH.data.datasets[1].backgroundColor = humColor + '20';
+                chartTH.update('none');
+            }
+            
+            // 更新亮度图表
+            if (chartLux) {
+                chartLux.options.plugins.legend.labels.color = textColor;
+                chartLux.options.scales.x.ticks.color = textColor;
+                chartLux.options.scales.x.grid.color = gridColor;
+                chartLux.options.scales.y.ticks.color = textColor;
+                chartLux.options.scales.y.grid.color = gridColor;
+                
+                chartLux.data.datasets[0].borderColor = luxColor;
+                chartLux.data.datasets[0].backgroundColor = luxColor + '20';
+                chartLux.update('none');
+            }
+            
+            // 更新烟雾图表
+            if (chartSmoke) {
+                chartSmoke.options.plugins.legend.labels.color = textColor;
+                chartSmoke.options.scales.x.ticks.color = textColor;
+                chartSmoke.options.scales.x.grid.color = gridColor;
+                chartSmoke.options.scales.y.ticks.color = textColor;
+                chartSmoke.options.scales.y.grid.color = gridColor;
+                
+                chartSmoke.data.datasets[0].borderColor = smokeColor;
+                chartSmoke.data.datasets[0].backgroundColor = smokeColor + '20';
+                chartSmoke.update('none');
+            }
+            
+            // 更新大气压图表
+            if (chartPressure) {
+                chartPressure.options.plugins.legend.labels.color = textColor;
+                chartPressure.options.scales.x.ticks.color = textColor;
+                chartPressure.options.scales.x.grid.color = gridColor;
+                chartPressure.options.scales.y.ticks.color = textColor;
+                chartPressure.options.scales.y.grid.color = gridColor;
+                
+                chartPressure.data.datasets[0].borderColor = pressureColor;
+                chartPressure.data.datasets[0].backgroundColor = pressureColor + '20';
+                chartPressure.update('none');
+            }
+        }
+        
+        // 通知鸿蒙应用图表已就绪
+        console.log('Charts initialized');
+    </script>
+</body>
+</html>
+

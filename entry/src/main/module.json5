@@ -1,5 +1,6 @@
 {
   "module": {
+    "routerMap": "$profile:route_map",
     "name": "entry",
     "type": "entry",
     "description": "$string:module_desc",

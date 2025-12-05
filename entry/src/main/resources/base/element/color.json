@@ -30,7 +30,19 @@
     },
     {
       "name": "home_card_border",
-      "value": "#00000000"
+      "value": "#E3E4E9"
+    },
+    {
+      "name": "online_state_bgc",
+      "value": "#E9F3EA"
+    },
+    {
+      "name": "offline_state_bgc",
+      "value": "#F8E7E6"
+    },
+    {
+      "name": "show_realtime_data",
+      "value": "#2563eb"
     }
   ]
 }

@@ -1,0 +1,11 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!--
+      路径解释：
+      M16.5 4  -> 起点在右上方
+      L8.5 12  -> 顶点在左侧中间 (X=8.5, Y=12)
+      L16.5 20 -> 终点在右下方
+      stroke-width="2.5" -> 线条加粗一点点，比标准的2.0更有质感
+      stroke-linecap="round" -> 圆角端点
+    -->
+    <path d="M16.5 4L8.5 12L16.5 20" stroke="black" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
