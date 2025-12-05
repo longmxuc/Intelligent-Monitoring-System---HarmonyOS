@@ -342,7 +342,7 @@ export struct DataLoadFloatButton {
         }
         .width('90%')
         .constraintSize({ maxWidth: 400 })
-        .height('70%')
+        .height('80%')
         .constraintSize({ maxHeight: 600 })
         .backgroundColor($r("app.color.home_card_background"))
         .borderRadius(16)
@@ -352,9 +352,10 @@ export struct DataLoadFloatButton {
           offsetX: 0,
           offsetY: 8
         })
-        .align(Alignment.Center) // 面板在屏幕中间
+        .justifyContent(FlexAlign.Center)
+        .alignItems(HorizontalAlign.Center)
         .zIndex(999)
-        .margin('auto') // 配合 Stack 居中
+        .margin({right:"5%",bottom:"15%"})
       }
 
       // 2. 悬浮按钮 (仅在面板关闭时显示，或者一直显示看需求)
