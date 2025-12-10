@@ -41,6 +41,25 @@ export struct AnalysisPage {
     }
   }
   
+  // 更新 WebView 主题（通过 JavaScript 检测系统主题）
+  private updateWebViewTheme(): void {
+    try {
+      // 通过 JavaScript 的 matchMedia API 检测系统主题
+      this.webviewController.runJavaScript(`
+        (function() {
+          const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          const theme = isDark ? 'dark' : 'light';
+          if (document.documentElement) {
+            document.documentElement.setAttribute('data-theme', theme);
+            console.log('[AI助手] 主题已设置为: ' + theme);
+          }
+        })();
+      `);
+    } catch (err) {
+      console.error('[AI助手主题] 设置失败:', JSON.stringify(err));
+    }
+  }
+  
   // 代理 AI 请求（避免 CORS）
   private async proxyAIRequest(requestBody: string): Promise<void> {
     try {
@@ -396,11 +415,13 @@ export struct AnalysisPage {
             .margin({ left: 16, right: 16 })
             .backgroundColor($r("app.color.home_background"))
             .clip(true) // 裁剪边界，确保圆角生效
+            .darkMode(WebDarkMode.Auto) // 自动跟随系统主题
             .onControllerAttached(() => {
               console.info('WebView 控制器已附加');
-              // WebView 加载完成后，立即更新数据
+              // WebView 加载完成后，立即更新数据和主题
               setTimeout(() => {
                 this.updateWebViewData();
+                this.updateWebViewTheme();
               }, 1000);
             })
             .javaScriptAccess(true)
@@ -424,9 +445,10 @@ export struct AnalysisPage {
             })
             .onPageEnd(() => {
               console.info('WebView 页面加载完成');
-              // 页面加载完成后，更新数据
+              // 页面加载完成后，更新数据和主题
               setTimeout(() => {
                 this.updateWebViewData();
+                this.updateWebViewTheme();
               }, 500);
             })
             .onConsole((event) => {

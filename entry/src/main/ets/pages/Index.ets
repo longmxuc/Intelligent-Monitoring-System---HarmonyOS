@@ -1,6 +1,7 @@
 import { DevicesPage } from './DevicesPage';
 import { AnalysisPage } from './AnalysisPage';
 import { webview } from '@kit.ArkWeb';
+import { ControlPage } from './ControlPage';
 
 @Entry
 @ComponentV2
@@ -10,8 +11,8 @@ struct Index {
   @Provider('pageStack') pageStack: NavPathStack = new NavPathStack();
 
   // 定义主题色，方便后期统一修改
-  private readonly selectedColor: string = "#007DFF"; // 选中颜色（华为蓝）
-  private readonly normalColor: string = "#999999";   // 未选中颜色（灰色）
+  public readonly selectedColor: string = "#007DFF"; // 选中颜色（华为蓝）
+  public readonly normalColor: string = "#999999";   // 未选中颜色（灰色）
   
   // 双击检测
   private lastClickTime: number = 0;
@@ -20,6 +21,11 @@ struct Index {
   
   // WebView 控制器
   private webViewController: webview.WebviewController = new webview.WebviewController();
+  
+  aboutToAppear(): void {
+    // 页面加载时更新主题
+    this.updateWebViewTheme();
+  }
 
   build() {
     Navigation(this.pageStack) {
@@ -33,7 +39,13 @@ struct Index {
         }
         .tabBar(this.TabBuilder("首页", 0, $r("app.media.ic_home")))
 
-        // 2. 分析
+        // 2. 控制
+        TabContent() {
+          ControlPage()
+        }
+        .tabBar(this.TabBuilder("控制", 1, $r("app.media.ic_control")))
+
+        // 3. 分析
         TabContent() {
           if (this.showWebAnalysis) {
             this.buildWebAnalysisPage()
@@ -41,19 +53,19 @@ struct Index {
             AnalysisPage()
           }
         }
-        .tabBar(this.TabBuilder("分析", 1, $r("app.media.ic_analysis")))
+        .tabBar(this.TabBuilder("AI·分析", 2, $r("app.media.ic_analysis")))
 
-        // 3. 消息
+        // 4. 消息
         TabContent() {
           Text("消息页内容").fontSize(30)
         }
-        .tabBar(this.TabBuilder("消息", 2, $r("app.media.ic_message")))
+        .tabBar(this.TabBuilder("消息", 3, $r("app.media.ic_message")))
 
-        // 4. 关于
+        // 5. 关于
         TabContent() {
           Text("关于页内容").fontSize(30)
         }
-        .tabBar(this.TabBuilder("关于", 3, $r("app.media.ic_about")))
+        .tabBar(this.TabBuilder("关于", 4, $r("app.media.ic_about")))
       }
       .backgroundColor($r("app.color.home_background"))
       .barHeight(56)
@@ -61,7 +73,7 @@ struct Index {
       .onChange((index: number) => {
         this.currentIndex = index;
         // 切换到其他Tab时，自动回到原生分析页
-        // if (index !== 1 && this.showWebAnalysis) {
+        // if (index !== 2 && this.showWebAnalysis) {
         //   this.showWebAnalysis = false;
         // }
       })
@@ -77,11 +89,11 @@ struct Index {
     const currentTime = Date.now();
     
     // 检测双击分析按钮（索引为1）
-    if (targetIndex === 1) {
+    if (targetIndex === 2) {
       console.info(`[分析Tab] 上次点击: ${this.lastClickIndex}, 时间间隔: ${currentTime - this.lastClickTime}ms`);
       
-      if (this.lastClickIndex === 1 && 
-          this.currentIndex === 1 && // 必须已经在分析页
+      if (this.lastClickIndex === 2 &&
+          this.currentIndex === 2 && // 必须已经在分析页
           (currentTime - this.lastClickTime) < this.DOUBLE_CLICK_INTERVAL) {
         // 双击了分析按钮，切换到Web版
         console.info('[双击检测] 触发双击，切换到Web版数据分析');
@@ -99,6 +111,25 @@ struct Index {
     
     // 切换到目标Tab
     this.currentIndex = targetIndex;
+  }
+  
+  // 更新WebView主题（通过 JavaScript 检测系统主题）
+  private updateWebViewTheme(): void {
+    try {
+      // 通过 JavaScript 的 matchMedia API 检测系统主题
+      this.webViewController.runJavaScript(`
+        (function() {
+          const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          const theme = isDark ? 'dark' : 'light';
+          if (document.documentElement) {
+            document.documentElement.setAttribute('data-theme', theme);
+            console.log('[Web分析页] 主题已设置为: ' + theme);
+          }
+        })();
+      `);
+    } catch (e) {
+      console.info('[主题] WebView尚未加载，等待onPageEnd后设置');
+    }
   }
   
   // 构建Web版分析页
@@ -133,9 +164,9 @@ struct Index {
       .width('100%')
       .height(44)
       .padding({ left: 12, right: 12 })
-      .backgroundColor('#f5f7fa')
+      .backgroundColor($r("app.color.home_background"))
       .borderWidth({ bottom: 1 })
-      .borderColor('#e5e7eb')
+      .borderColor($r("app.color.home_background"))
 
       // WebView
       Web({ src: 'https://znhj.iepose.cn/analysis.html', controller: this.webViewController })
@@ -145,11 +176,14 @@ struct Index {
         .domStorageAccess(true)
         .mixedMode(MixedMode.All)
         .cacheMode(CacheMode.Default)
+        .darkMode(WebDarkMode.Auto) // 自动跟随系统主题
         .onPageBegin(() => {
           console.info('[Web分析页] 开始加载');
         })
         .onPageEnd(() => {
           console.info('[Web分析页] 加载完成');
+          // 页面加载完成后设置主题
+          this.updateWebViewTheme();
         })
         .onErrorReceive((event) => {
           console.error('[Web分析页] 加载错误:', JSON.stringify(event));

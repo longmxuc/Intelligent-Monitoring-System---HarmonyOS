@@ -1,0 +1,17 @@
+<!-- Icon: Balance Scale (Redesigned) -->
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- 顶部横梁 -->
+    <path d="M5 8H19" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- 中心支柱 -->
+    <path d="M12 4V20" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- 底座 -->
+    <path d="M8 20H16" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- 左托盘绳索 -->
+    <path d="M6 8V12" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- 右托盘绳索 -->
+    <path d="M18 8V12" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- 左托盘 (半圆弧) -->
+    <path d="M4 12C4 14.5 6 15.5 6 15.5C6 15.5 8 14.5 8 12" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- 右托盘 (半圆弧) -->
+    <path d="M16 12C16 14.5 18 15.5 18 15.5C18 15.5 20 14.5 20 12" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

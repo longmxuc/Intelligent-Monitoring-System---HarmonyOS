@@ -43,6 +43,22 @@
     {
       "name": "show_realtime_data",
       "value": "#2563eb"
+    },
+    {
+      "name": "home_subtitle_text",
+      "value": "#6B7280"
+    },
+    {
+      "name": "control_device_select_bg",
+      "value": "#F0F6FE"
+    },
+    {
+      "name": "control_icon_bg",
+      "value": "#F9FAFB"
+    },
+    {
+      "name": "card_shadow",
+      "value": "#0000000A"
     }
   ]
 }

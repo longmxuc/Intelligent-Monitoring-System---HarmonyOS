@@ -4,6 +4,11 @@
       "name": "DeviceDetailPage",
       "pageSourceFile": "src/main/ets/pages/DeviceDetailPage.ets",
       "buildFunction": "DeviceDetailPageBuilder"
+    },
+    {
+      "name": "ControlSensorPage",
+      "pageSourceFile": "src/main/ets/pages/ControlSensorPage.ets",
+      "buildFunction": "ControlSensorPageBuilder"
     }
   ]
 }
