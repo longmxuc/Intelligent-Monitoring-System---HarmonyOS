@@ -506,13 +506,13 @@ export struct MessagePage {
       Row() {
         Text("在此处查看系统的全部异常消息")
           .fontSize(12)
-          .fontColor("#999999")
+          .fontColor($r("app.color.home_status_text"))
           .fontWeight(FontWeight.Medium)
       }
       .width('100%')
       .justifyContent(FlexAlign.Start)
       .padding({ top: 12, bottom: 12, left: 16 })
-      .backgroundColor(Color.White)
+      .backgroundColor($r("app.color.home_card_background"))
 
       // 2. 原生筛选栏 (使用 Select 组件)
       Row() {
@@ -560,8 +560,8 @@ export struct MessagePage {
       }
       .width('100%')
       .height(44)
-      .backgroundColor(Color.White)
-      .shadow({ radius: 10, color: "rgba(0,0,0,0.05)", offsetY: 2 })
+      .backgroundColor($r("app.color.home_card_background"))
+      .shadow({ radius: 10, color: $r("app.color.card_shadow"), offsetY: 2 })
       .zIndex(10)
       .justifyContent(FlexAlign.SpaceBetween)
       .padding({ left: 8, right: 8 })
@@ -576,7 +576,7 @@ export struct MessagePage {
             .color(this.blueColor)
           Text("加载中...")
             .fontSize(12)
-            .fontColor("#999999")
+            .fontColor($r("app.color.home_status_text"))
             .margin({ top: 12 })
         }
         .width('100%')
@@ -587,7 +587,7 @@ export struct MessagePage {
         Column() {
           Text("暂无消息")
             .fontSize(14)
-            .fontColor("#CCCCCC")
+            .fontColor($r("app.color.home_subtitle_text"))
             .margin({ top: 40 })
         }
         .width('100%')
@@ -606,7 +606,7 @@ export struct MessagePage {
           ListItem() {
             Text("已显示全部历史消息")
               .fontSize(10)
-              .fontColor("#CCCCCC")
+              .fontColor($r("app.color.home_subtitle_text"))
               .width('100%')
               .textAlign(TextAlign.Center)
               .margin({ top: 10, bottom: 30 })
@@ -617,12 +617,12 @@ export struct MessagePage {
         .layoutWeight(1) // 占满剩余空间
         .scrollBar(BarState.Off)
         .padding({ left: 16, right: 16 })
-        .backgroundColor("#F5F7FA")
+        .backgroundColor($r("app.color.home_background"))
       }
     }
     .width('100%')
     .height('100%')
-    .backgroundColor("#F5F7FA")
+    .backgroundColor($r("app.color.home_background"))
   }
 
   // --- 封装的原生 Select 组件构建器 ---
@@ -639,7 +639,7 @@ export struct MessagePage {
       .selectedOptionFont({ size: 14, weight: FontWeight.Medium })
       .selectedOptionFontColor(this.blueColor)
       .optionFont({ size: 14, weight: FontWeight.Normal })
-      .optionFontColor("#333333")
+      .optionFontColor($r("app.color.home_value_text"))
       .backgroundColor(Color.Transparent)
       .onSelect((_index: number, value: string) => {
         onSelect(value);
@@ -662,7 +662,7 @@ export struct MessagePage {
           Text(msg.title)
             .fontSize(15)
             .fontWeight(FontWeight.Bold)
-            .fontColor("#333333")
+            .fontColor($r("app.color.home_value_text"))
 
           // 状态标签
           Text(msg.status)
@@ -682,11 +682,11 @@ export struct MessagePage {
         Row() {
           Text(msg.time)
             .fontSize(12)
-            .fontColor("#999999")
+            .fontColor($r("app.color.home_status_text"))
             .fontWeight(FontWeight.Medium)
           Text(` · ${msg.date}`)
             .fontSize(10)
-            .fontColor("#CCCCCC")
+            .fontColor($r("app.color.home_subtitle_text"))
         }
       }
       .width('100%')
@@ -698,11 +698,11 @@ export struct MessagePage {
         Column() {
           Text("来源设备")
             .fontSize(10)
-            .fontColor("#999999")
+            .fontColor($r("app.color.home_status_text"))
             .margin({ bottom: 4 })
           Text(msg.device)
             .fontSize(13)
-            .fontColor("#333333")
+            .fontColor($r("app.color.home_value_text"))
             .fontWeight(FontWeight.Medium)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
         }
@@ -712,11 +712,11 @@ export struct MessagePage {
         Column() {
           Text("异常数值")
             .fontSize(10)
-            .fontColor("#999999")
+            .fontColor($r("app.color.home_status_text"))
             .margin({ bottom: 4 })
           Text(msg.value)
             .fontSize(13)
-            .fontColor("#333333")
+            .fontColor($r("app.color.home_value_text"))
             .fontWeight(FontWeight.Medium)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
         }
@@ -725,13 +725,13 @@ export struct MessagePage {
       }
       .width('100%')
       .padding(12)
-      .backgroundColor("#F9FAFB")
+      .backgroundColor($r("app.color.control_icon_bg"))
       .borderRadius(8)
     }
     .width('100%')
     .padding(16)
-    .backgroundColor(Color.White)
+    .backgroundColor($r("app.color.home_card_background"))
     .borderRadius(12)
-    .shadow({ radius: 10, color: "rgba(0,0,0,0.03)", offsetY: 2 })
+    .shadow({ radius: 10, color: $r("app.color.card_shadow"), offsetY: 2 })
   }
 }
