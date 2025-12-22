@@ -314,14 +314,14 @@ export struct AboutPage {
       Column() {
         // 圆点
         if (log.isLatest) {
-          // 最新版本：实心蓝点 + 呼吸效果外圈
+          // 实心蓝点 + 呼吸效果外圈
           Stack() {
             Circle({ width: 14, height: 14 }).fill($r('app.color.about_blue_alpha'))
             Circle({ width: 8, height: 8 }).fill($r('app.color.about_primary_blue'))
           }
           .margin({ top: 4 }) // 对齐文本
         } else {
-          // 旧版本：灰色空心点
+          // 灰色空心点
           Circle({ width: 9, height: 9 })
             .fill($r('app.color.about_timeline_dot'))
             .margin({ top: 6 })

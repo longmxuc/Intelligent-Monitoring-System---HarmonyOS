@@ -4,7 +4,7 @@ import { BusinessError } from '@kit.BasicServicesKit';
 // 服务器地址配置（统一管理）
 export const SERVER_HOST = 'znhj.iepose.cn';
 
-// WebSocket警告通知消息接口（后端推送格式）
+// WebSocket警告通知消息接口
 export interface WarningNotificationMessage {
   type: string;
   warning_type?: string;

@@ -7,7 +7,7 @@ import {
 } from './DevicesPageLogic';
 import promptAction from '@ohos.promptAction';
 
-// 设备卡片组件
+// 自定义设备卡片组件
 @ComponentV2
 struct DeviceCard {
   @Require @Param device: DeviceInfo;
@@ -172,7 +172,6 @@ export struct DevicesPage {
   // 接收父组件(Index)提供的 pageStack
   @Consumer('pageStack') pageStack: NavPathStack = new NavPathStack();
 
-  // @State 替换为 @Local (V2 语法)
   @Local wsConnected: boolean = false;
   @Local devices: DeviceInfo[] = [];
   @Local onlineCount: number = 0;
