@@ -1,5 +1,12 @@
 {
   "src": [
-    "pages/Index"
+    "pages/Index",
+    "pages/Temp",
+    "pages/Wet",
+    "pages/ppm",
+    "pages/Pa",
+    "pages/Light",
+    "pages/LBS",
+    "pages/DisTemp"
   ]
 }
