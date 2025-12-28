@@ -203,13 +203,13 @@ struct Index {
       Image(iconResource)
         .size({ width: 24, height: 24 })
         .objectFit(ImageFit.Contain)
-        // 【关键点】这里使用 fillColor 动态改变 SVG 的颜色
         .fillColor(this.currentIndex === targetIndex ? this.selectedColor : this.normalColor)
-        // 添加一个简单的缩放动画效果（可选）
+        // 缩放效果
         .scale({
           x: this.currentIndex === targetIndex ? 1.1 : 1.0,
           y: this.currentIndex === targetIndex ? 1.1 : 1.0
         })
+        // 过渡
         .animation({ duration: 200 })
 
       Text(title)

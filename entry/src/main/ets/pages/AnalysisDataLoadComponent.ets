@@ -1,14 +1,11 @@
 import http from '@ohos.net.http';
 import promptAction from '@ohos.promptAction';
-// 请确保这些引用路径在你项目中是正确的
 import { SensorData } from './DeviceDetailPageLogic';
 import { SERVER_HOST } from './WebSocketManager';
 import { DeviceInfo } from './DevicesPageLogic';
 import { LoadMode, TimeUnit, LoadParams, DataLoadCallback } from './DataLoadComponent';
 
-// ----------------------------------------------------------------
-// 1. 数据加载逻辑类 (保持不变)
-// ----------------------------------------------------------------
+// 数据加载逻辑类
 class AnalysisDataLoader {
   private deviceId: string | null; // null表示全部设备
   private callback: DataLoadCallback;
@@ -116,9 +113,7 @@ class AnalysisDataLoader {
   }
 }
 
-// ----------------------------------------------------------------
 // 2. 分析页数据加载组件
-// ----------------------------------------------------------------
 @ComponentV2
 export struct AnalysisDataLoadComponent {
   @Require @Param deviceList: DeviceInfo[];
@@ -248,11 +243,10 @@ export struct AnalysisDataLoadComponent {
     .width('100%')
   }
 
-  // --- 弹窗面板 (已修改标题栏) ---
+  // 弹窗面板
   @Builder
   buildLoadPanel() {
     Column() {
-      // 标题栏：只保留一个 X
       Row() {
         Text('📊 加载历史数据')
           .fontSize(18)
@@ -306,8 +300,6 @@ export struct AnalysisDataLoadComponent {
     .width('100%')
     .height('100%')
   }
-
-  // --- 辅助方法 (保持不变) ---
 
   @Builder
   buildDetailForm() {

@@ -1,12 +1,12 @@
 {
   "src": [
     "pages/Index",
-    "pages/Temp",
-    "pages/Wet",
-    "pages/ppm",
-    "pages/Pa",
-    "pages/Light",
-    "pages/LBS",
-    "pages/DisTemp"
+    "pages/info_page/Temp",
+    "pages/info_page/Wet",
+    "pages/info_page/ppm",
+    "pages/info_page/Pa",
+    "pages/info_page/Light",
+    "pages/info_page/LBS",
+    "pages/info_page/DisTemp"
   ]
 }

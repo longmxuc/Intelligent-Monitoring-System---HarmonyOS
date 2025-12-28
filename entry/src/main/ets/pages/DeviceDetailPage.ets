@@ -64,10 +64,10 @@ struct MetricCard {
               .fontColor($r("app.color.home_title_text"))
             Text("i")
               .fontSize(12)
-              .fontWeight(FontWeight.Medium)
-              .fontColor($r("app.color.show_realtime_data"))
-              .width(22)
-              .height(22)
+              .fontWeight(FontWeight.Lighter)
+              .fontColor($r("app.color.home_title_text"))
+              .width(18)
+              .height(18)
               .textAlign(TextAlign.Center)
               .backgroundColor($r("app.color.home_card_background"))
               .borderRadius(11)
@@ -75,7 +75,6 @@ struct MetricCard {
               .shadow({ radius: 6, color: $r("app.color.card_shadow"), offsetY: 2 })
               .onClick(()=>{
                 router.pushUrl({url:this.link})
-                console.log(`地址去：${this.link}`)
               })
           }
           Text(this.valueText)
@@ -489,7 +488,7 @@ export struct DeviceDetailPage {
                     valueText: `${this.temp !== undefined && this.temp !== null ? this.temp.toFixed(2) : '--'} ℃`,
                     trend: this.tempTrend,
                     valueFontSize: 24,
-                    link:"pages/Temp"
+                    link:"pages/info_page/Temp"
                   })
                 }
 
@@ -501,7 +500,7 @@ export struct DeviceDetailPage {
                       this.temp2 !== null ? Math.abs(this.temp - this.temp2).toFixed(2) : '--'} ℃`,
                     trend: this.tempDiffTrend,
                     valueFontSize: 24,
-                    link:"pages/DisTemp"
+                    link:"pages/info_page/DisTemp"
                   })
                 }
 
@@ -512,7 +511,7 @@ export struct DeviceDetailPage {
                     valueText: `${this.hum !== undefined && this.hum !== null ? this.hum.toFixed(2) : '--'} %`,
                     trend: this.humTrend,
                     valueFontSize: 24,
-                    link:"pages/Wet"
+                    link:"pages/info_page/Wet"
                   })
                 }
 
@@ -523,7 +522,7 @@ export struct DeviceDetailPage {
                     valueText: `${this.lux !== undefined && this.lux !== null ? this.lux.toFixed(1) : '--'} lux`,
                     trend: this.luxTrend,
                     valueFontSize: 24,
-                    link:"pages/Light"
+                    link:"pages/info_page/Light"
                   })
                 }
 
@@ -534,7 +533,7 @@ export struct DeviceDetailPage {
                     valueText: `${this.smoke !== undefined && this.smoke !== null ? this.smoke.toFixed(1) : '--'} ppm`,
                     trend: this.smokeTrend,
                     valueFontSize: 24,
-                    link:"pages/ppm"
+                    link:"pages/info_page/ppm"
                   })
                 }
 
@@ -546,7 +545,7 @@ export struct DeviceDetailPage {
                       '--'} hPa`,
                     trend: this.pressureTrend,
                     valueFontSize: 22,
-                    link:"pages/Pa"
+                    link:"pages/info_page/Pa"
                   })
                 }
               }
@@ -577,17 +576,17 @@ export struct DeviceDetailPage {
                   Blank()
                   Text("i")
                     .fontSize(12)
-                    .fontWeight(FontWeight.Medium)
-                    .fontColor($r("app.color.show_realtime_data"))
-                    .width(22)
-                    .height(22)
+                    .fontWeight(FontWeight.Lighter)
+                    .fontColor($r("app.color.home_title_text"))
+                    .width(18)
+                    .height(18)
                     .textAlign(TextAlign.Center)
                     .backgroundColor($r("app.color.home_card_background"))
                     .borderRadius(11)
                     .border({ width: 1, color: $r("app.color.home_card_border") })
                     .shadow({ radius: 6, color: $r("app.color.card_shadow"), offsetY: 2 })
                     .onClick(() => {
-                      router.pushUrl({url:"pages/LBS"})
+                      router.pushUrl({url:"pages/info_page/LBS"})
 
                     })
 
