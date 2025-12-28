@@ -224,6 +224,7 @@ export class DevicesPageLogic {
             });
           }
           this.devices = normalizedDevices;
+          // 此时更新onDevicesChanged即可通知UI回调
           this.callbacks.onDevicesChanged(this.devices);
           this.updateDeviceCounts();
           console.info('设备列表加载成功:', this.devices.length, '台设备');
@@ -256,6 +257,7 @@ export class DevicesPageLogic {
     this.loadDevices();
     this.setupWebSocketManager();
     // 启动设备状态检查定时器，每5秒检查一次
+    // 返回值是一个定时器编号
     const intervalId = setInterval(() => {
       this.checkAllDevicesStatus();
     }, 5000);
@@ -276,6 +278,7 @@ export class DevicesPageLogic {
           temp2: msg.temp2,
           ts: msg.ts
         };
+        // 传入即更新
         this.handleReadingMessage(payload);
       },
       onWarning: (msg) => {

@@ -185,6 +185,7 @@ export struct DevicesPage {
 
   // 生命周期函数
   aboutToAppear() {
+    // 避免重复创建callback
     if (this.logic === null) {
       const callbacks: DevicesPageViewCallbacks = {
         onWsConnectedChanged: (connected: boolean) => {

@@ -93,7 +93,6 @@ struct MetricCard {
 }
 
 
-// 升级为主页面组件为 @ComponentV2
 @ComponentV2
 export struct DeviceDetailPage {
   // 1. 接收路由栈，用于回退
@@ -101,7 +100,7 @@ export struct DeviceDetailPage {
   // 2. 接收页面参数
   @Local deviceId: string = "";
   @Local deviceName: string = ""; // 设备名称
-  // UI 状态 (全部升级为 @Local)
+  // UI 状态
   @Local wsConnected: boolean = false;
   @Local temp: number | undefined = undefined;
   @Local hum: number | undefined = undefined;
