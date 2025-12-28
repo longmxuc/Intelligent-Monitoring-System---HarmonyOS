@@ -5,6 +5,7 @@ import http from '@ohos.net.http';
 import ConfigurationConstant from '@ohos.app.ability.ConfigurationConstant';
 import { emitter } from '@kit.BasicServicesKit';
 import { DataLoadFloatButton } from './DataLoadComponent';
+import { router } from '@kit.ArkUI';
 
 // 定位查询接口返回结构
 interface LocationQueryResponse {
@@ -14,6 +15,7 @@ interface LocationQueryResponse {
 }
 
 // 顶层趋势行组件（避免作用域问题）
+
 @Component
 struct TrendRow {
   @Prop trend: TrendResult;
@@ -49,14 +51,33 @@ struct MetricCard {
   @Prop valueText: string;
   @Prop trend: TrendResult;
   @Prop valueFontSize: number;
+  @Prop link?:string;
+
 
   build() {
     Row({ space: 5 }) {
       Column() {
         Column({ space: 10 }) {
-          Text(this.title)
-            .fontSize(14)
-            .fontColor($r("app.color.home_title_text"))
+          Row({space:10}){
+            Text(this.title)
+              .fontSize(14)
+              .fontColor($r("app.color.home_title_text"))
+            Text("i")
+              .fontSize(12)
+              .fontWeight(FontWeight.Medium)
+              .fontColor($r("app.color.show_realtime_data"))
+              .width(22)
+              .height(22)
+              .textAlign(TextAlign.Center)
+              .backgroundColor($r("app.color.home_card_background"))
+              .borderRadius(11)
+              .border({ width: 1, color: $r("app.color.home_card_border") })
+              .shadow({ radius: 6, color: $r("app.color.card_shadow"), offsetY: 2 })
+              .onClick(()=>{
+                router.pushUrl({url:this.link})
+                console.log(`地址去：${this.link}`)
+              })
+          }
           Text(this.valueText)
             .fontSize(this.valueFontSize)
             .fontWeight(FontWeight.Bolder)
@@ -468,7 +489,8 @@ export struct DeviceDetailPage {
                     title: "温度",
                     valueText: `${this.temp !== undefined && this.temp !== null ? this.temp.toFixed(2) : '--'} ℃`,
                     trend: this.tempTrend,
-                    valueFontSize: 24
+                    valueFontSize: 24,
+                    link:"pages/Temp"
                   })
                 }
 
@@ -479,7 +501,8 @@ export struct DeviceDetailPage {
                     valueText: `${this.temp !== undefined && this.temp !== null && this.temp2 !== undefined &&
                       this.temp2 !== null ? Math.abs(this.temp - this.temp2).toFixed(2) : '--'} ℃`,
                     trend: this.tempDiffTrend,
-                    valueFontSize: 24
+                    valueFontSize: 24,
+                    link:"pages/DisTemp"
                   })
                 }
 
@@ -489,7 +512,8 @@ export struct DeviceDetailPage {
                     title: "湿度",
                     valueText: `${this.hum !== undefined && this.hum !== null ? this.hum.toFixed(2) : '--'} %`,
                     trend: this.humTrend,
-                    valueFontSize: 24
+                    valueFontSize: 24,
+                    link:"pages/Wet"
                   })
                 }
 
@@ -499,7 +523,8 @@ export struct DeviceDetailPage {
                     title: "亮度",
                     valueText: `${this.lux !== undefined && this.lux !== null ? this.lux.toFixed(1) : '--'} lux`,
                     trend: this.luxTrend,
-                    valueFontSize: 24
+                    valueFontSize: 24,
+                    link:"pages/Light"
                   })
                 }
 
@@ -509,7 +534,8 @@ export struct DeviceDetailPage {
                     title: "烟雾",
                     valueText: `${this.smoke !== undefined && this.smoke !== null ? this.smoke.toFixed(1) : '--'} ppm`,
                     trend: this.smokeTrend,
-                    valueFontSize: 24
+                    valueFontSize: 24,
+                    link:"pages/ppm"
                   })
                 }
 
@@ -520,7 +546,8 @@ export struct DeviceDetailPage {
                     valueText: `${this.pressure !== undefined && this.pressure !== null ? this.pressure.toFixed(1) :
                       '--'} hPa`,
                     trend: this.pressureTrend,
-                    valueFontSize: 22
+                    valueFontSize: 22,
+                    link:"pages/Pa"
                   })
                 }
               }
@@ -543,10 +570,28 @@ export struct DeviceDetailPage {
                     .fontWeight(FontWeight.Bolder)
                     .fontSize(16)
                     .fontColor($r("app.color.home_value_text"))
+
                   Text(this.locationStatus)
                     .fontColor(this.locationStatusColor)
                     .fontSize(12)
                     .margin({ left: 8 })
+                  Blank()
+                  Text("i")
+                    .fontSize(12)
+                    .fontWeight(FontWeight.Medium)
+                    .fontColor($r("app.color.show_realtime_data"))
+                    .width(22)
+                    .height(22)
+                    .textAlign(TextAlign.Center)
+                    .backgroundColor($r("app.color.home_card_background"))
+                    .borderRadius(11)
+                    .border({ width: 1, color: $r("app.color.home_card_border") })
+                    .shadow({ radius: 6, color: $r("app.color.card_shadow"), offsetY: 2 })
+                    .onClick(() => {
+                      router.pushUrl({url:"pages/LBS"})
+
+                    })
+
                 }
                 .width("100%")
 

@@ -10,4 +10,5 @@
 /.clang-tidy
 **/.test
 /.appanalyzer
-/README
+/README.DS_Store
+**/.DS_Store
